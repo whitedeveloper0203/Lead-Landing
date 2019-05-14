@@ -1,0 +1,110 @@
+.item { 
+  .mat-card {
+    margin: 0 16px;
+  }
+}
+
+table {
+  text-align: center !important;
+  width: 100%;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+.mat-header-cell {
+  text-align: center;
+}
+
+$base-duration: 0.25s;
+
+.trigger {
+	margin: 0 0.75rem;
+	padding: 0.425rem 1.25rem;
+	border: none;
+	border-radius: 0.25rem;
+	box-shadow: 0 0.0625rem 0.1875rem rgba(0,0,0,0.12), 0 0.0625rem 0.125rem rgba(0,0,0,0.24);
+	transition: all $base-duration cubic-bezier(.25,.8,.25,1);
+	font-size: 0.875rem;
+	font-weight: 300;
+	
+	i {
+		margin-right: 0.3125rem;
+	}
+	
+	&:hover {
+		box-shadow: 0 0.875rem 1.75rem rgba(0,0,0,0.25), 0 0.625rem 0.625rem rgba(0,0,0,0.22);
+	}
+}
+
+.modal {
+    &.show .modal-dialog {
+        transition: 0.25s all;
+        opacity: 0;
+        transform: translate(0, 5vh);
+    }
+
+    &.custom-show .modal-dialog {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+}
+
+.modal-content{
+  animation-name: example;
+  animation-duration: 0.1s;
+
+  background-color: white;
+  border-radius: 0.3125rem;
+  box-shadow: 0 0 2.5rem rgba(0,0,0,0.5);
+}
+
+@keyframes example {
+  0%   {transform: scale(0.2)}
+  30%  {transform: scale(0.4)}
+  60%  {transform: scale(0.6)}  
+  100% {transform: scale(1)}
+}
+
+.line_3_description{
+	display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    /* autoprefixer: off */
+    -webkit-box-orient: vertical;
+    /* autoprefixer: on */
+}
+
+.text-area{
+    height: 150px;
+}
+
+.ellipsis {
+    text-overflow: ellipsis;
+  
+    /* Required for text-overflow to do anything */
+    white-space: nowrap;
+    overflow: hidden;
+}
+.form-check-label{
+    margin-top: 11px;
+}
+#pic-select-overlay1 {
+  background: url(/assets/images/edit-pen-write-icon.png) no-repeat scroll left center #eff5ff;
+  border-radius: 15px;
+  color: #000;
+  font-family: helvetica,arial;
+  font-size: 13px;
+  height: 30px;
+  left: 5px;
+  line-height: 30px;
+  position: absolute;
+  text-align: center;
+  top: 10px;
+  padding: 0 7px 0 35px;
+  z-index: 1200;
+  border: 1px solid royalblue;
+}

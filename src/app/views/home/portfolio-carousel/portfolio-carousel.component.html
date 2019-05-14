@@ -1,0 +1,117 @@
+<section id="portfolio-section" class="portfolio-section home-section" [ngClass]="{'light-gray': backgroundGray}">
+    <div class="container">
+      <div class="section-header">
+        <h2>Create New Lead Object</h2>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <mat-form-field>
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+          </mat-form-field>
+        </div>
+        <div class="col-6">
+          <button mat-mini-fab color="primary" style="float:right;" (click)="open(create, 0)">
+            <mat-icon aria-label="Example icon-button with a heart icon">create</mat-icon>
+          </button>
+        </div>
+        <div class="col-12">
+          <table mat-table *ngIf="dataSource.length > 0" [dataSource]="dataSourceMat" class="mat-elevation-z8">
+
+            <ng-container *ngFor="let column of displayedColumns1; let index=index" matColumnDef="{{column.field}}">
+              <th mat-header-cell *matHeaderCellDef> {{column.label}} </th>
+              <td mat-cell *matCellDef="let element"> 
+                <a *ngIf="index==0" (click)="open(view, 1, object_ids[index])">{{element[column.field]}}</a> 
+                <a *ngIf="index!=0">{{element[column.field]}}</a> 
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<ng-template #view let-c="close" let-d="dismiss">
+  <div class="modal-header bg-primary">
+      <h4 class="modal-title" id="modal-basic-title" *ngIf="mode==1">Detailed information</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+  <div class="modal-body">
+      <div *ngFor="let item of view_display_order" class="form-group row">
+          <label class="col-md-3 col-12 col-form-label text-left ellipsis" title={{item.label}}> {{item.label}} </label>
+          <div class="col-md-9 col-12">
+              <input *ngIf="item.type=='boolean'" type="checkbox" class="form-check-label" [checked]="objects.data[view_index][remove__c(item.name)]=='true'" [class.disabled]="true"/>
+          
+              <input *ngIf="(item.type=='reference'||item.type=='parent') && objects.data[view_index][remove__c(item.name)] != null" type="text" class="form-control" 
+                      value="{{references[item.name]['data'][objects.data[view_index][remove__c(item.name)]][remove__c(afterDot(item.type_value))]}}" [class.disabled]="true" />
+              
+              <input *ngIf="(item.type=='reference'||item.type=='parent') && objects.data[view_index][remove__c(item.name)] == null" type="text" class="form-control" 
+                      value="" [class.disabled]="true" />
+              
+              <input *ngIf="item.type!='boolean'&&item.type!='reference'&&item.type!='parent'" class="form-control" value="{{objects.data[view_index][remove__c(item.name)]}}" [class.disabled]="true"/>
+          </div>
+      </div> 
+  </div>
+</ng-template>
+
+<ng-template #create let-c="close" let-d="dismiss">
+    <div class="modal-header bg-success">
+      <h4 class="modal-title" id="modal-basic-title">Create New Lead</h4>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="addForm" (ngSubmit)="onSubmit()" class="form-horizontal ng-untouched ng-pristine ng-valid">
+            <div *ngFor="let item of insert_display_order" class="form-group">
+                <div class="row" *ngIf="item.type!='root'">
+                    <label class="col-md-3 col-form-label text-left ellipsis" title={{item.label}}>{{item.label}}</label>
+                    <div class="col-md-9">
+                        
+                        <!-- Add field by item.type -->
+                        <input *ngIf="item.type!='textarea'&&item.type!='boolean'&&item.type!='reference'&&item.type!='datetime'&&item.type!='date'&&item.type!='picklist'&&item.type!='parent'" 
+                                type="text" formControlName={{remove__c(item.name)}} class="form-control" [ngClass]="{ 'is-invalid': submitted && f[remove__c(item.name)].errors }"/>
+                        
+                        <textarea *ngIf="item.type=='textarea'" type="text" formControlName={{remove__c(item.name)}} class="form-control text-area" [ngClass]="{ 'is-invalid': submitted && f[remove__c(item.name)].errors }"></textarea>
+                        
+                        <input *ngIf="item.type=='boolean'" type="checkbox" formControlName={{remove__c(item.name)}} [checked]="f[remove__c(item.name)].value=='true'" class="form-check-label"/>
+                        
+                        <mat-form-field *ngIf="item.type=='datetime'||item.type=='date'" class="example-full-width">
+                            <input [ngClass]="{ 'is-invalid': submitted && f[remove__c(item.name)].errors }" matInput formControlName={{remove__c(item.name)}} [matDatepicker]="picker" placeholder="Choose a date" >
+                            <mat-datepicker-toggle matSuffix [for]="picker">
+                                <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+
+                        <select *ngIf="(item.type=='reference')||(item.type=='parent') && references.hasOwnProperty(item.name)" formControlName={{remove__c(item.name)}} 
+                                class="form-control" [ngClass]="{ 'is-invalid': submitted && f[remove__c(item.name)].errors, 'disabled':item.type=='parent' && mode==2 }">
+                            <option *ngFor="let key of make_keys(item.name)" [value]="key">{{references[item.name]['data'][key][remove__c(afterDot(item.type_value))]}}</option>
+                        </select> 
+
+                        <select *ngIf="item.type=='picklist'" formControlName={{remove__c(item.name)}} class="form-control" 
+                                [ngClass]="{ 'is-invalid': submitted && f[remove__c(item.name)].errors }">
+                            <option *ngFor="let key of make_picklist(item.type_value)" [value]="key">{{key}}</option>
+                        </select> 
+
+                        <span class="help-block"><small>{{item.inlineHelpText}}</small></span>
+                        <div *ngIf="submitted && f[remove__c(item.name)].errors" class="invalid-feedback">
+                            <div *ngIf="f[remove__c(item.name)].errors">{{print(remove__c(item.name), f[remove__c(item.name)].errors)}}</div>
+                            <!--<div *ngIf="f[remove__c(item.name)].errors.required">required</div>-->
+                        </div>
+                    </div>   
+                </div>    
+            </div>
+            <div class="form-group col-md-12">
+                <button *ngIf="mode!=1" [disabled]="loading_submit" type="submit" class="btn btn-primary float-right">
+                    <i class="far fa-save"></i>
+                    Save
+                    <img *ngIf="loading_submit" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+                </button>   
+            </div>
+        </form>
+    </div>
+</ng-template>
