@@ -7,5 +7,5 @@ export const environment = {
   org_id: 'a0C55000003fr49EAA',
   metadata_url: 'osha-metadata.herokuapp.com',
   stage: 'dev',
-  server_url: 'http://localhost:5200',
+  server_url: 'https://lead-landing.herokuapp.com',
 };
